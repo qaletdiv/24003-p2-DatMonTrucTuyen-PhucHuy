@@ -9,7 +9,9 @@ export const menuItems: MenuItem[] = [
     category: "Burger",
     description:
       "Burger bò Úc nướng vừa chín tới, phô mai cheddar tan chảy, kèm rau xà lách tươi và sốt đặc biệt.",
+    special: true,
   },
+
   {
     id: "2",
     name: "Pizza Hải Sản",
@@ -18,6 +20,7 @@ export const menuItems: MenuItem[] = [
     category: "Pizza",
     description:
       "Pizza đế giòn phủ tôm, mực, thanh cua và phô mai mozzarella nướng chảy.",
+    special: true,
   },
   {
     id: "3",
@@ -26,6 +29,7 @@ export const menuItems: MenuItem[] = [
     image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=600",
     category: "Mỳ Ý",
     description: "Mỳ Ý Spaghetti với sốt cà chua bò bằm đậm đà.",
+    special: true,
   },
   {
     id: "4",
@@ -35,6 +39,7 @@ export const menuItems: MenuItem[] = [
     category: "Combo",
     description:
       "4 miếng gà rán giòn, 2 phần khoai tây, 2 ly nước ngọt size M.",
+    special: true,
   },
   {
     id: "5",
@@ -43,6 +48,7 @@ export const menuItems: MenuItem[] = [
     image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600",
     category: "Salad",
     description: "Rau xà lách tươi, cá ngừ, trứng luộc, sốt mè rang.",
+    special: false,
   },
   {
     id: "6",
@@ -51,5 +57,6 @@ export const menuItems: MenuItem[] = [
     image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600",
     category: "Đồ uống",
     description: "Trà đào kết hợp cam tươi và sả thơm.",
+    special: false,
   },
 ];

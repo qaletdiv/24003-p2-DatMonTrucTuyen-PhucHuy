@@ -41,9 +41,13 @@ const banners = [
 export default function Home() {
   const [slide, setSlide] = useState(0);
   const { isAuthenticated } = useAuth();
+  const [specialMeals, setSpecialMeals] = useState<MenuItem[]>([]);
+  const [isSpecialMealsLoading, setIsSpecialMealsLoading] = useState(true);
   const { addItem } = useCart();
   const { showToast } = useToast();
+
   const router = useRouter();
+
   //
   useEffect(() => {
     const id = setInterval(() => {
@@ -52,7 +56,26 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
-  const featured = menuItems.slice(0, 6);
+  useEffect(() => {
+    const fetchSpecialMeals = async () => {
+      try {
+        const response = await fetch("/api/special-meals");
+        if (!response.ok) {
+          throw new Error("Không tải được ưu đãi");
+        }
+        const data: MenuItem[] = await response.json();
+        setSpecialMeals(data);
+      } catch (error) {
+        console.error("Fetch special meals failed:", error);
+      } finally {
+        setIsSpecialMealsLoading(false);
+      }
+    };
+
+    fetchSpecialMeals();
+  }, []);
+
+  // const featured = menuItems.slice(0, 6);
 
   const handleQuickAdd = (item: MenuItem) => {
     if (!isAuthenticated) {
@@ -174,7 +197,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featured.map((item) => (
+            {specialMeals.map((item) => (
               <MenuCard key={item.id} item={item} onAdd={handleQuickAdd} />
             ))}
           </div>

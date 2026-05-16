@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MenuCard from "@/components/ui/MenuCard";
 import { menuItems } from "@/data/menuItems";
 import { useAuth } from "@/context/AuthContext";
@@ -10,8 +10,9 @@ import type { MenuItem } from "@/types";
 
 export default function MenuPage() {
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string>("Tất cả");
-
+  const [data, setData] = useState<MenuItem[]>([]);
+  // const [category, setCategory] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("");
   const { isAuthenticated } = useAuth();
   const { addItem } = useCart();
   const { showToast } = useToast();
@@ -19,18 +20,35 @@ export default function MenuPage() {
 
   const categories = useMemo(() => {
     const set = new Set(menuItems.map((m) => m.category));
-    return ["Tất cả", ...Array.from(set)];
+    return ["", ...Array.from(set)];
   }, []);
 
-  const filtered = useMemo(() => {
-    return menuItems.filter((m) => {
-      const matchCat =
-        activeCategory === "Tất cả" || m.category === activeCategory;
-      const matchSearch =
-        search.trim() === "" ||
-        m.name.toLowerCase().includes(search.toLowerCase());
-      return matchCat && matchSearch;
-    });
+  // const filtered = useMemo(() => {
+  //   return menuItems.filter((m) => {
+  //     const matchCat =
+  //       activeCategory === "Tất cả" || m.category === activeCategory;
+  //     const matchSearch =
+  //       search.trim() === "" ||
+  //       m.name.toLowerCase().includes(search.toLowerCase());
+  //     return matchCat && matchSearch;
+  //   });
+  // }, [search, activeCategory]);
+  useEffect(() => {
+    const fetchSearchMeals = async () => {
+      try {
+        const response = await fetch(
+          `/api/search-meals?search=${search}&category=${activeCategory}`,
+        );
+        if (!response.ok) {
+          throw new Error("Không tải được ưu đãi");
+        }
+        const result: MenuItem[] = await response.json();
+        setData(result);
+      } catch (err) {
+        console.error("Fetch special meals failed:", err);
+      }
+    };
+    fetchSearchMeals();
   }, [search, activeCategory]);
 
   const handleQuickAdd = (item: MenuItem) => {
@@ -66,7 +84,7 @@ export default function MenuPage() {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              {c}
+              {!c ? "Tất cả" : c}
             </button>
           ))}
         </div>
@@ -94,13 +112,13 @@ export default function MenuPage() {
         </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {data.length === 0 ? (
         <div className="py-20 text-center text-gray-500">
           Không tìm thấy món ăn phù hợp.
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filtered.map((item) => (
+          {data.map((item) => (
             <MenuCard key={item.id} item={item} onAdd={handleQuickAdd} />
           ))}
         </div>
