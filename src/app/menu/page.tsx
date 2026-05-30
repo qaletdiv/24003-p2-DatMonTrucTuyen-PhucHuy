@@ -26,7 +26,7 @@ export default function MenuPage() {
   // const filtered = useMemo(() => {
   //   return menuItems.filter((m) => {
   //     const matchCat =
-  //       activeCategory === "Tất cả" || m.category === activeCategory;
+  //       activeCategory === "All" || m.category === activeCategory;
   //     const matchSearch =
   //       search.trim() === "" ||
   //       m.name.toLowerCase().includes(search.toLowerCase());
@@ -40,7 +40,7 @@ export default function MenuPage() {
           `/api/search-meals?search=${search}&category=${activeCategory}`,
         );
         if (!response.ok) {
-          throw new Error("Không tải được ưu đãi");
+          throw new Error("Failed to load menu items");
         }
         const result: MenuItem[] = await response.json();
         setData(result);
@@ -53,22 +53,22 @@ export default function MenuPage() {
 
   const handleQuickAdd = (item: MenuItem) => {
     if (!isAuthenticated) {
-      showToast("Vui lòng đăng nhập để thêm món vào giỏ.", "info");
+      showToast("Please log in to add items to your cart.", "info");
       router.push("/login");
       return;
     }
     addItem(item, 1);
-    showToast(`Đã thêm "${item.name}" vào giỏ hàng.`);
+    showToast(`Added "${item.name}" to your cart.`);
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-          Thực đơn & Ưu đãi
+          Menu & Special Offers
         </h1>
         <p className="mt-2 text-gray-600">
-          Khám phá hơn 100+ món ăn được yêu thích nhất tại FoodOrder.
+          Explore over 100+ favorite dishes at FoodOrder.
         </p>
       </div>
 
@@ -84,7 +84,7 @@ export default function MenuPage() {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              {!c ? "Tất cả" : c}
+              {!c ? "All" : c}
             </button>
           ))}
         </div>
@@ -104,7 +104,7 @@ export default function MenuPage() {
           </svg>
           <input
             type="search"
-            placeholder="Tìm món ăn..."
+            placeholder="Search dishes..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-sm"
@@ -114,7 +114,7 @@ export default function MenuPage() {
 
       {data.length === 0 ? (
         <div className="py-20 text-center text-gray-500">
-          Không tìm thấy món ăn phù hợp.
+          No matching dishes found.
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

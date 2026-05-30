@@ -14,13 +14,13 @@ export default function Footer() {
             </span>
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Hệ thống đặt món ăn trực tuyến với hơn 100 món hấp dẫn, giao hàng
-            nhanh chóng và an toàn.
+            Online food ordering with 100+ delicious dishes, fast delivery, and
+            safe service.
           </p>
         </div>
 
         <div>
-          <h4 className="font-semibold text-gray-900 mb-3">Liên hệ</h4>
+          <h4 className="font-semibold text-gray-900 mb-3">Contact</h4>
           <ul className="space-y-2 text-sm text-gray-600">
             <li>
               <span className="font-medium text-gray-800">Hotline:</span>{" "}
@@ -38,45 +38,45 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <span className="font-medium text-gray-800">Trụ sở:</span> 123
-              Nguyễn Huệ, Quận 1, TP.HCM
+              <span className="font-medium text-gray-800">Head Office:</span>{" "}
+              123 Nguyen Hue, District 1, Ho Chi Minh City
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-semibold text-gray-900 mb-3">Liên kết nhanh</h4>
+          <h4 className="font-semibold text-gray-900 mb-3">Quick Links</h4>
           <ul className="space-y-2 text-sm text-gray-600">
             <li>
               <Link href="/menu" className="hover:text-orange-500">
-                Thực đơn
+                Menu
               </Link>
             </li>
             <li>
               <Link href="/news" className="hover:text-orange-500">
-                Tin tức & Ưu đãi
+                News & Deals
               </Link>
             </li>
             <li>
               <Link href="/stores" className="hover:text-orange-500">
-                Hệ thống cửa hàng
+                Store Locations
               </Link>
             </li>
             <li>
               <Link href="/privacy" className="hover:text-orange-500">
-                Chính sách bảo mật
+                Privacy Policy
               </Link>
             </li>
             <li>
               <Link href="/terms" className="hover:text-orange-500">
-                Điều khoản sử dụng
+                Terms of Service
               </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-semibold text-gray-900 mb-3">Kết nối với chúng tôi</h4>
+          <h4 className="font-semibold text-gray-900 mb-3">Connect With Us</h4>
           <div className="flex gap-3">
             <a
               href="#"
@@ -120,13 +120,13 @@ export default function Footer() {
 
       <div className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
-          <p>© {new Date().getFullYear()} FoodOrder. Mọi quyền được bảo lưu.</p>
+          <p>© {new Date().getFullYear()} FoodOrder. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-orange-500">
-              Chính sách bảo mật
+              Privacy Policy
             </Link>
             <Link href="/terms" className="hover:text-orange-500">
-              Điều khoản sử dụng
+              Terms of Service
             </Link>
           </div>
         </div>

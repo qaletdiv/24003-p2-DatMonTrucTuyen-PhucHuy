@@ -20,20 +20,20 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
     if (!name || !email || !password) {
-      setError("Vui lòng nhập đầy đủ thông tin.");
+      setError("Please fill in all required fields.");
       return;
     }
     if (password.length < 6) {
-      setError("Mật khẩu phải có ít nhất 6 ký tự.");
+      setError("Password must be at least 6 characters.");
       return;
     }
     if (password !== confirm) {
-      setError("Mật khẩu xác nhận không khớp.");
+      setError("Passwords do not match.");
       return;
     }
     const res = register(name, email, password);
     if (res.success) {
-      showToast("Đăng ký thành công! Chào mừng bạn đến với FoodOrder.");
+      showToast("Registration successful! Welcome to FoodOrder.");
       router.push("/");
     } else {
       setError(res.message);
@@ -43,20 +43,20 @@ export default function RegisterPage() {
   return (
     <div className="max-w-md mx-auto px-4 py-16">
       <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Đăng ký</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Sign Up</h1>
         <p className="text-sm text-gray-500 mb-6">
-          Tạo tài khoản mới để trải nghiệm FoodOrder.
+          Create a new account to experience FoodOrder.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Họ tên</label>
+            <label className="text-sm font-medium text-gray-700">Full Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="mt-1 w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-sm"
-              placeholder="Nguyễn Văn A"
+              placeholder="John Doe"
             />
           </div>
           <div>
@@ -66,29 +66,29 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1 w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-sm"
-              placeholder="ban@example.com"
+              placeholder="you@example.com"
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Mật khẩu</label>
+            <label className="text-sm font-medium text-gray-700">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-sm"
-              placeholder="Tối thiểu 6 ký tự"
+              placeholder="At least 6 characters"
             />
           </div>
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Xác nhận mật khẩu
+              Confirm Password
             </label>
             <input
               type="password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               className="mt-1 w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-sm"
-              placeholder="Nhập lại mật khẩu"
+              placeholder="Re-enter password"
             />
           </div>
 
@@ -99,14 +99,14 @@ export default function RegisterPage() {
           )}
 
           <Button size="lg" className="w-full">
-            Tạo tài khoản
+            Create Account
           </Button>
         </form>
 
         <p className="mt-6 text-sm text-center text-gray-600">
-          Đã có tài khoản?{" "}
+          Already have an account?{" "}
           <Link href="/login" className="text-orange-500 font-medium">
-            Đăng nhập
+            Log In
           </Link>
         </p>
       </div>

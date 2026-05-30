@@ -22,6 +22,7 @@ interface AuthContextType {
   ) => { success: boolean; message: string };
   logout: () => void;
   isAuthenticated: boolean;
+  authLoaded: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,19 +46,19 @@ function writeUsers(users: User[]) {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [authLoaded, setAuthLoaded] = useState(false);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(SESSION_KEY);
-      //cach 1
       if (raw) {
         const userData: User = JSON.parse(raw);
         setUser(userData);
       }
-      //cach 2
-      // if(raw)setUser(JSON.parse(raw) as User);
     } catch {
       setUser(null);
+    } finally {
+      setAuthLoaded(true);
     }
   }, []);
 
@@ -69,17 +70,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         u.password === password,
     );
     if (!found) {
-      return { success: false, message: "Email hoặc mật khẩu không đúng." };
+      return { success: false, message: "Incorrect email or password." };
     }
     setUser(found);
     localStorage.setItem(SESSION_KEY, JSON.stringify(found));
-    return { success: true, message: "Đăng nhập thành công." };
+    return { success: true, message: "Logged in successfully." };
   };
 
   const register = (name: string, email: string, password: string) => {
     const users = readUsers();
     if (users.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
-      return { success: false, message: "Email đã được sử dụng." };
+      return { success: false, message: "Email is already in use." };
     }
     const newUser: User = {
       id: generateId(),
@@ -91,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     writeUsers(updated);
     setUser(newUser);
     localStorage.setItem(SESSION_KEY, JSON.stringify(newUser));
-    return { success: true, message: "Đăng ký thành công." };
+    return { success: true, message: "Registration successful." };
   };
 
   const logout = () => {
@@ -101,7 +102,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, isAuthenticated: !!user }}
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        isAuthenticated: !!user,
+        authLoaded,
+      }}
     >
       {children}
     </AuthContext.Provider>

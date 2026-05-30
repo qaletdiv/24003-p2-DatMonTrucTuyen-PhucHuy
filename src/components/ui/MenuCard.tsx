@@ -45,7 +45,7 @@ export default function MenuCard({ item, onAdd }: MenuCardProps) {
           </span>
           {onAdd && (
             <Button size="sm" onClick={() => onAdd(item)}>
-              + Thêm nhanh
+              + Quick Add
             </Button>
           )}
         </div>

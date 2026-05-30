@@ -1,10 +1,10 @@
 interface ButtonProps {
-  children: React.ReactNode; // bất kỳ JSX nào
-  onClick?: () => void; // optional — không truyền cũng được
+  children: React.ReactNode;
+  onClick?: () => void;
   variant?: "primary" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
-  className?: string; // cho phép thêm class từ ngoài
+  className?: string;
 }
 export default function Button({
   children,

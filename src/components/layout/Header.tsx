@@ -6,10 +6,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 
 const navLinks = [
-  { href: "/", label: "Trang chủ" },
-  { href: "/menu", label: "Thực đơn & Đặt món" },
-  { href: "/news", label: "Tin tức & Ưu đãi" },
-  { href: "/stores", label: "Hệ thống cửa hàng" },
+  { href: "/", label: "Home" },
+  { href: "/menu", label: "Menu & Order" },
+  { href: "/news", label: "News & Deals" },
+  { href: "/stores", label: "Store Locations" },
 ];
 
 export default function Header() {
@@ -71,7 +71,7 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <Link
               href="/cart"
-              aria-label="Giỏ hàng"
+              aria-label="Cart"
               className="relative p-2 rounded-lg text-gray-700 hover:bg-gray-100"
             >
               <svg
@@ -136,7 +136,7 @@ export default function Header() {
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50"
                       onClick={() => setUserMenuOpen(false)}
                     >
-                      Lịch sử đơn hàng
+                      Order History
                     </Link>
                     <button
                       onClick={() => {
@@ -145,7 +145,7 @@ export default function Header() {
                       }}
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     >
-                      Đăng xuất
+                      Log Out
                     </button>
                   </div>
                 )}
@@ -156,13 +156,13 @@ export default function Header() {
                   href="/login"
                   className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-orange-500"
                 >
-                  Đăng nhập
+                  Log In
                 </Link>
                 <Link
                   href="/register"
                   className="px-4 py-1.5 text-sm font-medium rounded-lg bg-orange-500 text-white hover:bg-orange-600"
                 >
-                  Đăng ký
+                  Sign Up
                 </Link>
               </div>
             )}
@@ -170,7 +170,7 @@ export default function Header() {
             <button
               className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100"
               onClick={() => setMenuOpen((v) => !v)}
-              aria-label="Mở menu"
+              aria-label="Open menu"
             >
               <svg
                 className="w-6 h-6"
@@ -210,14 +210,14 @@ export default function Header() {
                   onClick={() => setMenuOpen(false)}
                   className="flex-1 px-3 py-2 rounded-lg text-sm font-medium text-center border border-gray-300 text-gray-700"
                 >
-                  Đăng nhập
+                  Log In
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setMenuOpen(false)}
                   className="flex-1 px-3 py-2 rounded-lg text-sm font-medium text-center bg-orange-500 text-white"
                 >
-                  Đăng ký
+                  Sign Up
                 </Link>
               </div>
             )}

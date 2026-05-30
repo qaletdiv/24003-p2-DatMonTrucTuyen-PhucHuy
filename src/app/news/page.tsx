@@ -3,7 +3,7 @@ import Link from "next/link";
 import { news } from "@/data/new";
 
 function formatNewsDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("vi-VN", {
+  return new Date(dateStr).toLocaleDateString("en-US", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -15,10 +15,10 @@ export default function NewsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-          Tin tức & Ưu đãi
+          News & Deals
         </h1>
         <p className="mt-2 text-gray-600">
-          Cập nhật những thông tin và chương trình khuyến mãi mới nhất.
+          Stay updated with the latest news and promotions.
         </p>
       </div>
 
@@ -49,7 +49,7 @@ export default function NewsPage() {
                 {n.excerpt}
               </p>
               <span className="mt-3 inline-flex text-sm font-medium text-orange-500">
-                Xem chi tiết →
+                Read More →
               </span>
             </div>
           </Link>

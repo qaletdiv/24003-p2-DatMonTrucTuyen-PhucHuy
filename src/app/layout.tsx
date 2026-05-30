@@ -5,6 +5,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import { OrderProvider } from "@/context/OrderContext";
+import { ServiceTypeProvider } from "@/context/ServiceTypeContext";
 import { ToastProvider } from "@/context/ToastContext";
 
 const geistSans = Geist({
@@ -18,9 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FoodOrder - Đặt món ăn trực tuyến",
+  title: "FoodOrder - Online Food Ordering",
   description:
-    "Hệ thống đặt món ăn trực tuyến với hơn 100 món hấp dẫn, giao hàng nhanh chóng và an toàn.",
+    "Online food ordering with 100+ delicious dishes, fast delivery, and safe service.",
 };
 
 export default function RootLayout({
@@ -29,18 +31,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900 min-h-screen flex flex-col`}
       >
         <AuthProvider>
-          <CartProvider>
-            <ToastProvider>
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </ToastProvider>
-          </CartProvider>
+          <OrderProvider>
+            <ServiceTypeProvider>
+              <CartProvider>
+                <ToastProvider>
+                  <Header />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                </ToastProvider>
+              </CartProvider>
+            </ServiceTypeProvider>
+          </OrderProvider>
         </AuthProvider>
       </body>
     </html>

@@ -13,27 +13,27 @@ import type { MenuItem } from "@/types";
 
 const banners = [
   {
-    title: "Đặt món ngon - Giao tận cửa",
-    subtitle: "Hơn 100 món ăn đặc trưng được phục vụ trong 30 phút.",
+    title: "Order Delicious Food - Delivered to Your Door",
+    subtitle: "Over 100 signature dishes served within 30 minutes.",
     image:
       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600",
-    cta: "Đặt món ngay",
+    cta: "Order Now",
     href: "/menu",
   },
   {
-    title: "Ưu đãi tháng 5 - Giảm 30%",
-    subtitle: "Áp dụng cho toàn bộ menu khi đặt món online.",
+    title: "May Deals - 30% Off",
+    subtitle: "Applies to the entire menu when ordering online.",
     image:
       "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1600",
-    cta: "Xem ưu đãi",
+    cta: "View Deals",
     href: "/news",
   },
   {
-    title: "Combo gia đình cuối tuần",
-    subtitle: "Tiết kiệm hơn 25% với combo dành cho 2–4 người.",
+    title: "Weekend Family Combo",
+    subtitle: "Save over 25% with combos for 2–4 people.",
     image:
       "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1600",
-    cta: "Khám phá ngay",
+    cta: "Explore Now",
     href: "/menu",
   },
 ];
@@ -61,7 +61,7 @@ export default function Home() {
       try {
         const response = await fetch("/api/special-meals");
         if (!response.ok) {
-          throw new Error("Không tải được ưu đãi");
+          throw new Error("Failed to load special offers");
         }
         const data: MenuItem[] = await response.json();
         setSpecialMeals(data);
@@ -79,12 +79,12 @@ export default function Home() {
 
   const handleQuickAdd = (item: MenuItem) => {
     if (!isAuthenticated) {
-      showToast("Vui lòng đăng nhập để thêm món vào giỏ.", "info");
+      showToast("Please log in to add items to your cart.", "info");
       router.push("/login");
       return;
     }
     addItem(item, 1);
-    showToast(`Đã thêm "${item.name}" vào giỏ hàng.`);
+    showToast(`Added "${item.name}" to your cart.`);
   };
 
   return (
@@ -127,7 +127,7 @@ export default function Home() {
             <button
               key={i}
               onClick={() => setSlide(i)}
-              aria-label={`Chuyển banner ${i + 1}`}
+              aria-label={`Go to banner ${i + 1}`}
               className={`h-2 rounded-full transition-all ${
                 i === slide ? "w-8 bg-orange-500" : "w-2 bg-white/70"
               }`}
@@ -141,7 +141,7 @@ export default function Home() {
           <div className="relative h-72 md:h-96 rounded-3xl overflow-hidden">
             <Image
               src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200"
-              alt="Về chúng tôi"
+              alt="About us"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -149,29 +149,29 @@ export default function Home() {
           </div>
           <div>
             <span className="inline-block text-orange-500 font-semibold mb-2">
-              Về chúng tôi
+              About Us
             </span>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-              Hương vị Việt - Chuẩn quốc tế
+              Vietnamese Flavors - International Standards
             </h2>
             <p className="mt-4 text-gray-600 leading-relaxed">
-              FoodOrder ra đời với sứ mệnh mang đến những bữa ăn ngon, an toàn
-              và tiện lợi cho mọi gia đình Việt. Chúng tôi cam kết sử dụng
-              nguyên liệu tươi sạch, quy trình chế biến nghiêm ngặt và đội ngũ
-              giao hàng chuyên nghiệp.
+              FoodOrder was founded with a mission to bring delicious, safe, and
+              convenient meals to every family. We are committed to using fresh
+              ingredients, strict food preparation standards, and a professional
+              delivery team.
             </p>
             <ul className="mt-6 space-y-2 text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="mt-1 text-orange-500">✓</span> Hơn 100+ món ăn
-                đặc trưng từ Việt Nam và quốc tế.
+                <span className="mt-1 text-orange-500">✓</span> Over 100+
+                signature dishes from Vietnam and around the world.
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-1 text-orange-500">✓</span> Giao hàng nhanh
-                trong vòng 30 phút.
+                <span className="mt-1 text-orange-500">✓</span> Fast delivery
+                within 30 minutes.
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-1 text-orange-500">✓</span> Đảm bảo vệ sinh
-                an toàn thực phẩm.
+                <span className="mt-1 text-orange-500">✓</span> Guaranteed food
+                safety and hygiene.
               </li>
             </ul>
           </div>
@@ -183,17 +183,17 @@ export default function Home() {
           <div className="flex items-end justify-between mb-8">
             <div>
               <span className="inline-block text-orange-500 font-semibold mb-1">
-                Bán chạy nhất
+                Best Sellers
               </span>
               <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">
-                Sản phẩm nổi bật
+                Featured Products
               </h2>
             </div>
             <Link
               href="/menu"
               className="hidden sm:inline-flex text-orange-500 font-semibold hover:underline"
             >
-              Xem tất cả →
+              View All →
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -203,7 +203,7 @@ export default function Home() {
           </div>
           <div className="mt-8 text-center sm:hidden">
             <Link href="/menu">
-              <Button variant="outline">Xem tất cả thực đơn</Button>
+              <Button variant="outline">View Full Menu</Button>
             </Link>
           </div>
         </div>
@@ -217,7 +217,7 @@ export default function Home() {
           >
             <Image
               src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=1200"
-              alt="Danh sách món ăn"
+              alt="Menu list"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -225,13 +225,13 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
             <div className="absolute inset-0 p-8 flex flex-col justify-center text-white">
               <span className="uppercase text-xs tracking-widest text-orange-300">
-                Đặt món
+                Order Food
               </span>
               <h3 className="mt-2 text-2xl md:text-3xl font-bold">
-                Danh sách món ăn & Ưu đãi
+                Menu & Special Offers
               </h3>
               <span className="mt-3 inline-flex text-sm font-semibold">
-                Khám phá ngay →
+                Explore Now →
               </span>
             </div>
           </Link>
@@ -242,7 +242,7 @@ export default function Home() {
           >
             <Image
               src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=1200"
-              alt="Hệ thống cửa hàng"
+              alt="Store locations"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -250,13 +250,13 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
             <div className="absolute inset-0 p-8 flex flex-col justify-center text-white">
               <span className="uppercase text-xs tracking-widest text-orange-300">
-                Có thể bạn quan tâm
+                You May Like
               </span>
               <h3 className="mt-2 text-2xl md:text-3xl font-bold">
-                Hệ thống cửa hàng toàn quốc
+                Nationwide Store Network
               </h3>
               <span className="mt-3 inline-flex text-sm font-semibold">
-                Xem chi nhánh gần bạn →
+                Find a Branch Near You →
               </span>
             </div>
           </Link>

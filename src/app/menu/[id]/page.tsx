@@ -1,8 +1,8 @@
 "use client";
-import { useMemo, useState, use } from "react";
+import { useMemo, useState, use, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { menuItems } from "@/data/menuItems";
 import { formatCurrency } from "@/utils/format";
 import Button from "@/components/ui/Button";
@@ -10,27 +10,25 @@ import MenuCard from "@/components/ui/MenuCard";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
+
 import type { MenuItem } from "@/types";
 
-export default function MenuDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
-  const item = menuItems.find((m) => m.id === id);
+export default function MenuDetailPage() {
+  const { id } = useParams();
+  // const item = menuItems.find((m) => m.id === id);
 
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
-
+  const [item, setItem] = useState<MenuItem>();
   const { isAuthenticated } = useAuth();
   const { addItem } = useCart();
   const { showToast } = useToast();
   const router = useRouter();
+  console.log(id, " base");
 
   const gallery = useMemo(
     () => (item ? [item.image, item.image, item.image] : []),
-    [item]
+    [item],
   );
 
   const related = useMemo(() => {
@@ -46,23 +44,39 @@ export default function MenuDetailPage({
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
-      showToast("Vui lòng đăng nhập để thêm món vào giỏ.", "info");
+      showToast("Please log in to add items to your cart.", "info");
       router.push("/login");
       return;
     }
     addItem(item, quantity);
-    showToast(`Đã thêm ${quantity} x "${item.name}" vào giỏ hàng.`);
+    showToast(`Added ${quantity} x "${item.name}" to your cart.`);
   };
+  useEffect(() => {
+    const fetchItem = async () => {
+      try {
+        const res = await fetch(`/api/meals/${id}`);
+        if (!res.ok) {
+          throw new Error("Failed to load item");
+        }
+        const output: MenuItem = await res.json();
+        console.log(output);
+        setItem(output);
+      } catch (err) {
+        console.error("Faild to fetch: " + err);
+      }
+    };
+    fetchItem();
+  }, [id]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <nav className="text-sm text-gray-500 mb-6">
         <Link href="/" className="hover:text-orange-500">
-          Trang chủ
+          Home
         </Link>
         <span className="mx-2">/</span>
         <Link href="/menu" className="hover:text-orange-500">
-          Thực đơn
+          Menu
         </Link>
         <span className="mx-2">/</span>
         <span className="text-gray-700">{item.name}</span>
@@ -129,26 +143,26 @@ export default function MenuDetailPage({
 
           <ul className="mt-5 space-y-2 text-sm text-gray-600">
             <li className="flex items-start gap-2">
-              <span className="text-orange-500">✓</span> Nguyên liệu tươi sạch,
-              nhập trong ngày.
+              <span className="text-orange-500">✓</span> Fresh ingredients
+              delivered daily.
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-orange-500">✓</span> Chế biến theo quy
-              trình tiêu chuẩn HACCP.
+              <span className="text-orange-500">✓</span> Prepared following
+              HACCP food safety standards.
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-orange-500">✓</span> Giao hàng nhanh trong
-              30 phút.
+              <span className="text-orange-500">✓</span> Fast delivery within 30
+              minutes.
             </li>
           </ul>
 
           <div className="mt-6">
-            <p className="text-sm font-medium text-gray-700 mb-2">Số lượng</p>
+            <p className="text-sm font-medium text-gray-700 mb-2">Quantity</p>
             <div className="inline-flex items-center border border-gray-200 rounded-xl overflow-hidden">
               <button
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 className="w-10 h-10 grid place-items-center text-gray-700 hover:bg-gray-100"
-                aria-label="Giảm số lượng"
+                aria-label="Decrease quantity"
               >
                 −
               </button>
@@ -156,7 +170,7 @@ export default function MenuDetailPage({
               <button
                 onClick={() => setQuantity((q) => Math.min(99, q + 1))}
                 className="w-10 h-10 grid place-items-center text-gray-700 hover:bg-gray-100"
-                aria-label="Tăng số lượng"
+                aria-label="Increase quantity"
               >
                 +
               </button>
@@ -169,27 +183,27 @@ export default function MenuDetailPage({
               onClick={handleAddToCart}
               className="flex-1 sm:flex-none"
             >
-              Thêm vào giỏ hàng
+              Add to Cart
             </Button>
             <Link href="/menu">
               <Button variant="outline" size="lg" className="w-full">
-                Tiếp tục mua sắm
+                Continue Shopping
               </Button>
             </Link>
           </div>
 
           {!isAuthenticated && (
             <p className="mt-3 text-sm text-gray-500">
-              Bạn cần{" "}
+              You need to{" "}
               <Link href="/login" className="text-orange-500 font-medium">
-                đăng nhập
+                log in
               </Link>{" "}
-              để thêm món vào giỏ.
+              to add items to your cart.
             </p>
           )}
 
           <div className="mt-6 p-4 rounded-2xl bg-orange-50 border border-orange-100 text-sm text-gray-700">
-            <p className="font-semibold text-orange-700 mb-1">Tổng kết</p>
+            <p className="font-semibold text-orange-700 mb-1">Summary</p>
             <p>
               {quantity} × {formatCurrency(item.price)} ={" "}
               <span className="font-bold text-orange-600">
@@ -203,7 +217,7 @@ export default function MenuDetailPage({
       {related.length > 0 && (
         <section className="mt-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Có thể bạn cũng thích
+            You May Also Like
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {related.map((m) => (

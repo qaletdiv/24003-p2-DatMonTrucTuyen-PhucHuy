@@ -21,6 +21,7 @@ export type OrderType =
 
 export interface Order {
   id: string;
+  userId: string;
   items: CartItem[];
   total: number;
   status: OrderStatus;
@@ -48,6 +49,8 @@ export interface Store {
   address: string;
   phone: string;
   openingHours: string;
+  lat: number;
+  lng: number;
 }
 
 export interface NewsItem {

@@ -1,30 +1,33 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import Button from "@/components/ui/Button";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
   const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!email || !password) {
-      setError("Vui lòng nhập đầy đủ email và mật khẩu.");
+      setError("Please enter both email and password.");
       return;
     }
     const res = login(email, password);
     if (res.success) {
-      showToast("Đăng nhập thành công!");
-      router.push("/");
+      showToast("Logged in successfully!");
+      router.push(callbackUrl.startsWith("/") ? callbackUrl : "/");
     } else {
       setError(res.message);
     }
@@ -33,9 +36,9 @@ export default function LoginPage() {
   return (
     <div className="max-w-md mx-auto px-4 py-16">
       <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Đăng nhập</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Log In</h1>
         <p className="text-sm text-gray-500 mb-6">
-          Đăng nhập để đặt món và theo dõi đơn hàng của bạn.
+          Log in to order food and track your orders.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -46,12 +49,12 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1 w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-sm"
-              placeholder="ban@example.com"
+              placeholder="you@example.com"
             />
           </div>
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Mật khẩu
+              Password
             </label>
             <input
               type="password"
@@ -68,18 +71,26 @@ export default function LoginPage() {
             </div>
           )}
 
-          <Button size="lg" className=" w-full" disabled={!email || !password}>
-            Đăng nhập
+          <Button size="lg" className="w-full" disabled={!email || !password}>
+            Log In
           </Button>
         </form>
 
         <p className="mt-6 text-sm text-center text-gray-600">
-          Chưa có tài khoản?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="text-orange-500 font-medium">
-            Đăng ký ngay
+            Sign up now
           </Link>
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
