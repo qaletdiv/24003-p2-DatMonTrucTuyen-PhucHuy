@@ -12,7 +12,7 @@ export async function GET(
     return NextResponse.json({ error: "not found!!" }, { status: 404 });
   }
   const relatedItems = menuItems.filter(
-    (meal) => meal.category === item.category,
+    (meal) => meal.category === item.category && meal.id != item.id,
   );
 
   return NextResponse.json(relatedItems);

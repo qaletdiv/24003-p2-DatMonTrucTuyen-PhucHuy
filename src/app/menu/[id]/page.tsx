@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState, use, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
@@ -20,6 +20,7 @@ export default function MenuDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [item, setItem] = useState<MenuItem>();
+  const [related, setRelated] = useState<MenuItem[]>([]);
   const { isAuthenticated } = useAuth();
   const { addItem } = useCart();
   const { showToast } = useToast();
@@ -31,16 +32,16 @@ export default function MenuDetailPage() {
     [item],
   );
 
-  const related = useMemo(() => {
-    if (!item) return [] as MenuItem[];
-    return menuItems
-      .filter((m) => m.category === item.category && m.id !== item.id)
-      .slice(0, 4);
-  }, [item]);
+  // const related = useMemo(() => {
+  //   if (!item) return [] as MenuItem[];
+  //   return menuItems
+  //     .filter((m) => m.category === item.category && m.id !== item.id)
+  //     .slice(0, 4);
+  // }, [item]);
 
-  if (!item) {
-    notFound();
-  }
+  // if (!item) {
+  //   notFound();
+  // }
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
@@ -48,8 +49,11 @@ export default function MenuDetailPage() {
       router.push("/login");
       return;
     }
+    if (!item) {
+      return showToast("item not found error!");
+    }
     addItem(item, quantity);
-    showToast(`Added ${quantity} x "${item.name}" to your cart.`);
+    showToast(`Added ${quantity} x "${item?.name}" to your cart.`);
   };
   useEffect(() => {
     const fetchItem = async () => {
@@ -68,6 +72,22 @@ export default function MenuDetailPage() {
     fetchItem();
   }, [id]);
 
+  useEffect(() => {
+    const fetchRelatedItem = async () => {
+      try {
+        const res = await fetch(`/api/meals/${id}/related-detail-meals`);
+
+        if (!res.ok) {
+          throw new Error("Faild to load item");
+        }
+        const output: MenuItem[] = await res.json();
+        setRelated(output || []);
+      } catch (error) {
+        console.log("faild to log " + error);
+      }
+    };
+    fetchRelatedItem();
+  }, [id]);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <nav className="text-sm text-gray-500 mb-6">
@@ -79,15 +99,15 @@ export default function MenuDetailPage() {
           Menu
         </Link>
         <span className="mx-2">/</span>
-        <span className="text-gray-700">{item.name}</span>
+        <span className="text-gray-700">{item?.name}</span>
       </nav>
 
       <div className="grid md:grid-cols-2 gap-10">
         <div>
           <div className="relative h-80 md:h-[460px] rounded-2xl overflow-hidden bg-gray-100">
             <Image
-              src={gallery[activeImage]}
-              alt={item.name}
+              src={gallery[activeImage] || "/vercel.svg"}
+              alt={item?.name || "Menu item image"}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -104,8 +124,8 @@ export default function MenuDetailPage() {
                 }`}
               >
                 <Image
-                  src={src}
-                  alt={`${item.name}-${i}`}
+                  src={src || "/vercel.svg"}
+                  alt={`${item?.name || "menu item"}-${i}`}
                   fill
                   className="object-cover"
                   sizes="200px"
@@ -117,25 +137,27 @@ export default function MenuDetailPage() {
 
         <div>
           <span className="inline-block px-3 py-1 text-xs font-medium bg-orange-50 text-orange-600 rounded-full">
-            {item.category}
+            {item?.category}
           </span>
           <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-gray-900">
-            {item.name}
+            {item?.name}
           </h1>
 
-          <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-orange-500">
-              {formatCurrency(item.price)}
-            </span>
-            <span className="text-sm text-gray-500 line-through">
-              {formatCurrency(Math.round(item.price * 1.2))}
-            </span>
-            <span className="text-xs font-semibold px-2 py-0.5 bg-red-100 text-red-600 rounded">
-              -20%
-            </span>
-          </div>
+          {item && (
+            <div className="mt-4 flex items-baseline gap-3">
+              <span className="text-3xl font-bold text-orange-500">
+                {formatCurrency(item.price)}
+              </span>
+              <span className="text-sm text-gray-500 line-through">
+                {formatCurrency(Math.round(item.price * 1.2))}
+              </span>
+              <span className="text-xs font-semibold px-2 py-0.5 bg-red-100 text-red-600 rounded">
+                -20%
+              </span>
+            </div>
+          )}
 
-          {item.description && (
+          {item?.description && (
             <p className="mt-5 text-gray-600 leading-relaxed">
               {item.description}
             </p>
@@ -202,15 +224,17 @@ export default function MenuDetailPage() {
             </p>
           )}
 
-          <div className="mt-6 p-4 rounded-2xl bg-orange-50 border border-orange-100 text-sm text-gray-700">
-            <p className="font-semibold text-orange-700 mb-1">Summary</p>
-            <p>
-              {quantity} × {formatCurrency(item.price)} ={" "}
-              <span className="font-bold text-orange-600">
-                {formatCurrency(quantity * item.price)}
-              </span>
-            </p>
-          </div>
+          {item && (
+            <div className="mt-6 p-4 rounded-2xl bg-orange-50 border border-orange-100 text-sm text-gray-700">
+              <p className="font-semibold text-orange-700 mb-1">Summary</p>
+              <p>
+                {quantity} × {formatCurrency(item.price)} ={" "}
+                <span className="font-bold text-orange-600">
+                  {formatCurrency(quantity * item.price)}
+                </span>
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
