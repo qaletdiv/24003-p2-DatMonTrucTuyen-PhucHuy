@@ -11,9 +11,9 @@ export async function GET(
   if (!item) {
     return NextResponse.json({ error: "not found!!" }, { status: 404 });
   }
-  const relatedItems = menuItems.filter(
-    (meal) => meal.category === item.category && meal.id != item.id,
-  );
+  const relatedItems = menuItems
+    .filter((meal) => meal.category === item.category && meal.id !== item.id)
+    .slice(0, 4);
 
   return NextResponse.json(relatedItems);
 }

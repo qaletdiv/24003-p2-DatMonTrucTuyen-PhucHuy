@@ -15,8 +15,9 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!name || !email || !password) {
@@ -31,12 +32,17 @@ export default function RegisterPage() {
       setError("Passwords do not match.");
       return;
     }
-    const res = register(name, email, password);
-    if (res.success) {
-      showToast("Registration successful! Welcome to FoodOrder.");
-      router.push("/");
-    } else {
-      setError(res.message);
+    setLoading(true);
+    try {
+      const res = await register(name, email, password);
+      if (res.success) {
+        showToast("Registration successful! Welcome to FoodOrder.");
+        router.push("/");
+      } else {
+        setError(res.message);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,8 +104,8 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <Button size="lg" className="w-full">
-            Create Account
+          <Button size="lg" className="w-full" disabled={loading}>
+            {loading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
 

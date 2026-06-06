@@ -9,6 +9,7 @@ export interface MenuItem {
 }
 
 export interface CartItem {
+  userId: string;
   item: MenuItem;
   quantity: number;
 }
@@ -37,7 +38,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  password: string;
+  password?: string;
   avatar?: string;
 }
 

@@ -2,8 +2,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, useParams, useRouter } from "next/navigation";
-import { menuItems } from "@/data/menuItems";
+import { useParams, useRouter } from "next/navigation";
 import { formatCurrency } from "@/utils/format";
 import Button from "@/components/ui/Button";
 import MenuCard from "@/components/ui/MenuCard";
@@ -25,23 +24,11 @@ export default function MenuDetailPage() {
   const { addItem } = useCart();
   const { showToast } = useToast();
   const router = useRouter();
-  console.log(id, " base");
 
   const gallery = useMemo(
     () => (item ? [item.image, item.image, item.image] : []),
     [item],
   );
-
-  // const related = useMemo(() => {
-  //   if (!item) return [] as MenuItem[];
-  //   return menuItems
-  //     .filter((m) => m.category === item.category && m.id !== item.id)
-  //     .slice(0, 4);
-  // }, [item]);
-
-  // if (!item) {
-  //   notFound();
-  // }
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
@@ -63,10 +50,8 @@ export default function MenuDetailPage() {
           throw new Error("Failed to load item");
         }
         const output: MenuItem = await res.json();
-        console.log(output);
         setItem(output);
-      } catch (err) {
-        console.error("Faild to fetch: " + err);
+      } catch {
       }
     };
     fetchItem();
@@ -82,9 +67,7 @@ export default function MenuDetailPage() {
         }
         const output: MenuItem[] = await res.json();
         setRelated(output || []);
-      } catch (error) {
-        console.log("faild to log " + error);
-      }
+      } catch {}
     };
     fetchRelatedItem();
   }, [id]);

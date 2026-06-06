@@ -11,7 +11,6 @@ import type { MenuItem } from "@/types";
 export default function MenuPage() {
   const [search, setSearch] = useState("");
   const [data, setData] = useState<MenuItem[]>([]);
-  // const [category, setCategory] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("");
   const { isAuthenticated } = useAuth();
   const { addItem } = useCart();
@@ -23,16 +22,6 @@ export default function MenuPage() {
     return ["", ...Array.from(set)];
   }, []);
 
-  // const filtered = useMemo(() => {
-  //   return menuItems.filter((m) => {
-  //     const matchCat =
-  //       activeCategory === "All" || m.category === activeCategory;
-  //     const matchSearch =
-  //       search.trim() === "" ||
-  //       m.name.toLowerCase().includes(search.toLowerCase());
-  //     return matchCat && matchSearch;
-  //   });
-  // }, [search, activeCategory]);
   useEffect(() => {
     const fetchSearchMeals = async () => {
       try {
@@ -44,9 +33,7 @@ export default function MenuPage() {
         }
         const result: MenuItem[] = await response.json();
         setData(result);
-      } catch (err) {
-        console.error("Fetch special meals failed:", err);
-      }
+      } catch {}
     };
     fetchSearchMeals();
   }, [search, activeCategory]);

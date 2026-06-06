@@ -14,22 +14,28 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
     }
-    const res = login(email, password);
-    if (res.success) {
-      showToast("Logged in successfully!");
-      router.push(callbackUrl.startsWith("/") ? callbackUrl : "/");
-    } else {
-      setError(res.message);
+    setLoading(true);
+    try {
+      const res = await login(email, password);
+      if (res.success) {
+        showToast("Logged in successfully!");
+        router.push(callbackUrl.startsWith("/") ? callbackUrl : "/");
+      } else {
+        setError(res.message);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,8 +77,8 @@ function LoginForm() {
             </div>
           )}
 
-          <Button size="lg" className="w-full" disabled={!email || !password}>
-            Log In
+          <Button size="lg" className="w-full" disabled={!email || !password || loading}>
+            {loading ? "Logging in..." : "Log In"}
           </Button>
         </form>
 

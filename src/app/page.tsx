@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import MenuCard from "@/components/ui/MenuCard";
 import Button from "@/components/ui/Button";
-import { menuItems } from "@/data/menuItems";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
@@ -48,7 +47,6 @@ export default function Home() {
 
   const router = useRouter();
 
-  //
   useEffect(() => {
     const id = setInterval(() => {
       setSlide((s) => (s + 1) % banners.length);
@@ -65,8 +63,7 @@ export default function Home() {
         }
         const data: MenuItem[] = await response.json();
         setSpecialMeals(data);
-      } catch (error) {
-        console.error("Fetch special meals failed:", error);
+      } catch {
       } finally {
         setIsSpecialMealsLoading(false);
       }
@@ -74,8 +71,6 @@ export default function Home() {
 
     fetchSpecialMeals();
   }, []);
-
-  // const featured = menuItems.slice(0, 6);
 
   const handleQuickAdd = (item: MenuItem) => {
     if (!isAuthenticated) {

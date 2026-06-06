@@ -5,6 +5,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useCallback,
   ReactNode,
 } from "react";
 import { CartItem, MenuItem } from "@/types";
@@ -21,60 +22,93 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const CART_KEY = "fos_cart";
-
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(CART_KEY);
-      if (raw) setItems(JSON.parse(raw) as CartItem[]);
-    } catch {
-      setItems([]);
-    }
-    setHydrated(true);
+    fetch("/api/cart")
+      .then((res) => res.json())
+      .then((data) => setItems(data.items ?? []))
+      .catch(() => setItems([]));
   }, []);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(CART_KEY, JSON.stringify(items));
-  }, [items, hydrated]);
-
-  const addItem = (item: MenuItem, quantity = 1) => {
+  const addItem = useCallback((item: MenuItem, quantity = 1) => {
     setItems((prev) => {
       const existing = prev.find((c) => c.item.id === item.id);
       if (existing) {
         return prev.map((c) =>
-          c.item.id === item.id ? { ...c, quantity: c.quantity + quantity } : c
+          c.item.id === item.id
+            ? { ...c, quantity: c.quantity + quantity }
+            : c,
         );
       }
-      return [...prev, { item, quantity }];
+      return [...prev, { userId: "", item, quantity }];
     });
-  };
 
-  const removeItem = (itemId: string) => {
+    fetch("/api/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item, quantity }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.items) setItems(data.items);
+      })
+      .catch(() => {});
+  }, []);
+
+  const removeItem = useCallback((itemId: string) => {
     setItems((prev) => prev.filter((c) => c.item.id !== itemId));
-  };
 
-  const updateQuantity = (itemId: string, quantity: number) => {
+    fetch(`/api/cart?itemId=${itemId}`, { method: "DELETE" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.items) setItems(data.items);
+      })
+      .catch(() => {});
+  }, []);
+
+  const updateQuantity = useCallback((itemId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(itemId);
-      return;
+      setItems((prev) => prev.filter((c) => c.item.id !== itemId));
+    } else {
+      setItems((prev) =>
+        prev.map((c) => (c.item.id === itemId ? { ...c, quantity } : c)),
+      );
     }
-    setItems((prev) =>
-      prev.map((c) => (c.item.id === itemId ? { ...c, quantity } : c))
-    );
-  };
 
-  const clearCart = () => setItems([]);
+    if (quantity <= 0) {
+      fetch(`/api/cart?itemId=${itemId}`, { method: "DELETE" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.items) setItems(data.items);
+        })
+        .catch(() => {});
+    } else {
+      fetch("/api/cart", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId, quantity }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.items) setItems(data.items);
+        })
+        .catch(() => {});
+    }
+  }, []);
+
+  const clearCart = useCallback(() => {
+    setItems([]);
+
+    fetch("/api/cart", { method: "DELETE" }).catch(() => {});
+  }, []);
 
   const { totalCount, totalPrice } = useMemo(() => {
     const totalCount = items.reduce((sum, c) => sum + c.quantity, 0);
     const totalPrice = items.reduce(
       (sum, c) => sum + c.quantity * c.item.price,
-      0
+      0,
     );
     return { totalCount, totalPrice };
   }, [items]);

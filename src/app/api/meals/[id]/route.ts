@@ -11,6 +11,5 @@ export async function GET(
   if (!item) {
     return NextResponse.json({ error: "Meal not found" }, { status: 404 });
   }
-  console.log(id, " router");
   return NextResponse.json(item);
 }
