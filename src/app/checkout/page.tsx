@@ -6,9 +6,7 @@ import { useEffect, useState } from "react";
 import { stores } from "@/data/stores";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
-import { useOrders } from "@/context/OrderContext";
 import { useServiceType } from "@/context/ServiceTypeContext";
-import { useToast } from "@/context/ToastContext";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import Button from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/format";
@@ -18,10 +16,8 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { isAuthenticated, authLoaded } = useRequireAuth("/checkout");
   const { user } = useAuth();
-  const { items, totalPrice, clearCart } = useCart();
-  const { placeOrder } = useOrders();
+  const { items, totalPrice } = useCart();
   const { orderType, setOrderType } = useServiceType();
-  const { showToast } = useToast();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -34,11 +30,6 @@ export default function CheckoutPage() {
   const [branchId, setBranchId] = useState(stores[0]?.id ?? "");
   const [pickupTime, setPickupTime] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvc, setCardCvc] = useState("");
-  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (!authLoaded) return;
@@ -82,8 +73,10 @@ export default function CheckoutPage() {
     return { type: "pickup", branchId, pickupTime };
   };
 
-  const submitOrder = (method: "cash" | "online") => {
+  const handleContinue = () => {
+    setError(null);
     const type = buildOrderType();
+
     if (!name.trim() || !phone.trim() || !address.trim()) {
       setError("Please fill in all delivery information fields.");
       return;
@@ -94,55 +87,26 @@ export default function CheckoutPage() {
     }
 
     setOrderType(type);
-    const status = method === "cash" ? "pending" : "completed";
-    const order = placeOrder({
-      items: [...items],
-      total: totalPrice,
-      status,
-      orderType: type,
-      paymentMethod: method,
-      customerName: name.trim(),
-      customerPhone: phone.trim(),
-      customerAddress: address.trim(),
-    });
 
-    if (!order) {
-      setError("Unable to place order. Please try again.");
-      return;
-    }
+    sessionStorage.setItem(
+      "fos_checkout",
+      JSON.stringify({
+        customerName: name.trim(),
+        customerPhone: phone.trim(),
+        customerAddress: address.trim(),
+        paymentMethod,
+        orderType: type,
+      }),
+    );
 
-    clearCart();
-    showToast("Order placed successfully!");
-    router.push(`/orders/${order.id}/confirmation`);
-  };
-
-  const handleConfirm = () => {
-    setError(null);
-    if (paymentMethod === "online") {
-      setShowPaymentModal(true);
-      return;
-    }
-    submitOrder("cash");
-  };
-
-  const handleOnlinePayment = () => {
-    if (!cardNumber.trim() || !cardExpiry.trim() || !cardCvc.trim()) {
-      setError("Please fill in all payment details.");
-      return;
-    }
-    setProcessing(true);
-    setTimeout(() => {
-      setProcessing(false);
-      setShowPaymentModal(false);
-      submitOrder("online");
-    }, 1500);
+    router.push("/confirm-payment");
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-extrabold text-gray-900">Checkout</h1>
       <p className="mt-2 text-gray-600">
-        Complete your order details and confirm payment.
+        Fill in your order details before reviewing payment.
       </p>
 
       <div className="mt-8 grid lg:grid-cols-3 gap-8">
@@ -342,8 +306,8 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            <Button size="lg" className="w-full mt-4" onClick={handleConfirm}>
-              Confirm Order
+            <Button size="lg" className="w-full mt-4" onClick={handleContinue}>
+              Continue to Payment
             </Button>
             <Link href="/cart" className="block mt-3">
               <Button variant="outline" size="lg" className="w-full">
@@ -353,59 +317,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
-
-      {showPaymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-            <h3 className="text-lg font-bold text-gray-900">Online Payment</h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Simulated payment — no real transaction will occur.
-            </p>
-            <div className="mt-4 space-y-3">
-              <input
-                type="text"
-                placeholder="Card number"
-                value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:border-orange-400 outline-none text-sm"
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="MM/YY"
-                  value={cardExpiry}
-                  onChange={(e) => setCardExpiry(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:border-orange-400 outline-none text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder="CVC"
-                  value={cardCvc}
-                  onChange={(e) => setCardCvc(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:border-orange-400 outline-none text-sm"
-                />
-              </div>
-            </div>
-            <div className="mt-5 flex gap-3">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setShowPaymentModal(false)}
-                disabled={processing}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="flex-1"
-                onClick={handleOnlinePayment}
-                disabled={processing}
-              >
-                {processing ? "Processing..." : "Pay Now"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -9,7 +9,6 @@ import {
   ReactNode,
 } from "react";
 import { CartItem, Order, OrderStatus, OrderType } from "@/types";
-import { generateId } from "@/utils/format";
 import { useAuth } from "./AuthContext";
 
 export interface PlaceOrderInput {
@@ -25,67 +24,64 @@ export interface PlaceOrderInput {
 
 interface OrderContextType {
   orders: Order[];
-  placeOrder: (input: PlaceOrderInput) => Order | null;
+  loading: boolean;
+  placeOrder: (input: PlaceOrderInput) => Promise<Order | null>;
   getOrderById: (id: string) => Order | undefined;
+  refreshOrders: () => Promise<void>;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
-function ordersKey(userId: string) {
-  return `fos_orders_${userId}`;
-}
-
-function readOrders(userId: string): Order[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(ordersKey(userId));
-    return raw ? (JSON.parse(raw) as Order[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeOrders(userId: string, orders: Order[]) {
-  localStorage.setItem(ordersKey(userId), JSON.stringify(orders));
-}
-
 export function OrderProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/orders");
+      if (!res.ok) {
+        setOrders([]);
+        return;
+      }
+      const data = await res.json();
+      setOrders(data.orders ?? []);
+    } catch {
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {
-      setOrders(readOrders(user.id));
+      fetchOrders();
     } else {
       setOrders([]);
     }
-  }, [user?.id]);
+  }, [user?.id, fetchOrders]);
 
   const placeOrder = useCallback(
-    (input: PlaceOrderInput): Order | null => {
-      if (!user) return null;
+    async (input: PlaceOrderInput): Promise<Order | null> => {
+      try {
+        const res = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(input),
+        });
 
-      const order: Order = {
-        id: generateId(),
-        userId: user.id,
-        items: input.items,
-        total: input.total,
-        status: input.status,
-        orderType: input.orderType,
-        paymentMethod: input.paymentMethod,
-        customerName: input.customerName,
-        customerPhone: input.customerPhone,
-        customerAddress: input.customerAddress,
-        createdAt: new Date().toISOString(),
-      };
+        if (!res.ok) return null;
 
-      const existing = readOrders(user.id);
-      const updated = [order, ...existing];
-      writeOrders(user.id, updated);
-      setOrders(updated);
-      return order;
+        const data = await res.json();
+        const order: Order = data.order;
+        setOrders((prev) => [order, ...prev]);
+        return order;
+      } catch {
+        return null;
+      }
     },
-    [user],
+    [],
   );
 
   const getOrderById = useCallback(
@@ -94,7 +90,9 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <OrderContext.Provider value={{ orders, placeOrder, getOrderById }}>
+    <OrderContext.Provider
+      value={{ orders, loading, placeOrder, getOrderById, refreshOrders: fetchOrders }}
+    >
       {children}
     </OrderContext.Provider>
   );
